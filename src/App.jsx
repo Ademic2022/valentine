@@ -73,16 +73,22 @@ function App() {
   };
 
   // Sound effect functions using Web Audio API
-  const playPopSound = () => {
-    // Debounce: only play if at least 150ms has passed since last sound
+  const playPopSound = async () => {
+    // Debounce: only play if at least 100ms has passed since last sound
     const now = Date.now();
-    if (now - lastSoundTime.current < 150) {
+    if (now - lastSoundTime.current < 100) {
       return;
     }
     lastSoundTime.current = now;
 
     try {
       const audioContext = getAudioContext();
+
+      // Resume audio context if suspended (required on mobile)
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -108,9 +114,15 @@ function App() {
     }
   };
 
-  const playCelebrationSound = () => {
+  const playCelebrationSound = async () => {
     try {
       const audioContext = getAudioContext();
+
+      // Resume audio context if suspended (required on mobile)
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
       const notes = [523.25, 659.25, 783.99, 1046.5]; // C, E, G, C (major chord)
 
       notes.forEach((freq, index) => {
