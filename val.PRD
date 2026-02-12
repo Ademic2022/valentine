@@ -1,0 +1,114 @@
+## 🚀 Advanced Valentine Interactive Web App (React Version)
+
+I want to build a **fun, interactive, and visually appealing Valentine’s web app using React**.
+
+### 💖 Core Concept
+
+When the page loads, it should display a romantic message:
+
+> **“Deal!!! Will you be my Valentine? ❤️”**
+
+The entire layout should be centered both vertically and horizontally.
+
+---
+
+## 🎯 Functional Requirements
+
+### 1️⃣ Buttons
+
+Initially, show two buttons:
+
+* **Yes 💖**
+* **Try other option 🤔**
+
+---
+
+### 2️⃣ Try Other Option Behavior
+
+When the user clicks **“Try other option”**:
+
+* A new button appears:
+  **“No 😅”**
+
+* The “No” button should be impossible to click:
+
+  * When the user hovers over it, it should smoothly move to a random position.
+  * The movement should be animated (not instant teleporting).
+  * It must always stay fully inside the visible viewport.
+  * On mobile, it should move when tapped or when the finger gets close (touch start).
+
+---
+
+### 3️⃣ Yes Button Behavior
+
+When the user clicks **“Yes 💖”**:
+
+* Trigger:
+
+  * 🎉 Confetti explosion animation
+  * 💘 Floating heart animations
+  * ✨ Smooth scaling animation of the success message
+
+* Replace the original message with:
+
+> **“Yay!!! I knew you would say yes! 💘✨”**
+
+* Add a soft bounce or glow effect to the message.
+* Optional: Add romantic background music (can be muted by default).
+
+---
+
+## 🎨 Design Requirements
+
+* Theme: Cute, romantic, pink/red gradient background
+* Use soft shadows and rounded buttons
+* Add hover animations for buttons (scale + glow)
+* Smooth transitions everywhere
+* Floating animated hearts in the background
+* Subtle particle or sparkle effects
+* Fully responsive (mobile + desktop)
+* Modern UI design
+
+---
+
+## ⚛️ Technical Requirements
+
+* Use **React (functional components + hooks)**
+* Use modern styling:
+
+  * TailwindCSS or CSS modules (preferred: Tailwind)
+* Use a confetti library like:
+
+  * `canvas-confetti` or `react-confetti`
+* Use clean component structure
+* Use state management for:
+
+  * Showing the "No" button
+  * Triggering animations
+  * Confetti effect
+* Make animations smooth using:
+
+  * CSS transitions OR Framer Motion (preferred for advanced animation)
+
+---
+
+## ✨ Extra Polish (Advanced Touch)
+
+* Add smooth entrance animation when the page loads.
+* Add a playful shake animation when trying to catch the “No” button.
+* Add a growing effect to the “Yes” button every time the “No” button escapes.
+* Add subtle sound effects (optional).
+* Make it feel like a mini romantic interactive game.
+
+---
+
+The final result should feel:
+
+* Fun
+* Playful
+* Romantic
+* Polished
+* Modern
+* High-quality
+
+---
