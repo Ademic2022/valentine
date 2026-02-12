@@ -350,8 +350,8 @@ function App() {
                     top: noButtonPosition.y,
                   }}
                   transition={{
-                    left: { type: "tween", duration: 0.08, ease: "easeOut" },
-                    top: { type: "tween", duration: 0.08, ease: "easeOut" },
+                    left: { type: "tween", duration: 0.04, ease: "easeOut" },
+                    top: { type: "tween", duration: 0.04, ease: "easeOut" },
                     opacity: { duration: 0.1 },
                   }}
                   style={{
