@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import "./App.css";
@@ -31,10 +31,13 @@ function App() {
     { x: "60%", y: "80%" },
   ];
 
+  const isMobile = useMemo(() => window.innerWidth < 768, []);
+
   useEffect(() => {
-    // Generate floating hearts in the background with more variety
+    // Generate floating hearts - fewer on mobile
     const heartEmojis = ["💕", "💖", "💗", "💓", "💝", "❤️", "💘"];
-    const newHearts = Array.from({ length: 25 }, (_, i) => ({
+    const heartCount = isMobile ? 12 : 25;
+    const newHearts = Array.from({ length: heartCount }, (_, i) => ({
       id: i,
       emoji: heartEmojis[Math.floor(Math.random() * heartEmojis.length)],
       left: Math.random() * 100,
@@ -44,8 +47,9 @@ function App() {
     }));
     setHearts(newHearts);
 
-    // Generate floating orbs for background depth
-    const newOrbs = Array.from({ length: 8 }, (_, i) => ({
+    // Generate floating orbs - fewer on mobile
+    const orbCount = isMobile ? 4 : 8;
+    const newOrbs = Array.from({ length: orbCount }, (_, i) => ({
       id: i,
       size: 100 + Math.random() * 250,
       left: Math.random() * 100,
@@ -55,64 +59,78 @@ function App() {
       opacity: 0.15 + Math.random() * 0.15,
     }));
     setOrbs(newOrbs);
-  }, []);
+  }, [isMobile]);
+
+  // Reuse audio context for better performance
+  const getAudioContext = () => {
+    if (!window.audioCtx) {
+      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return window.audioCtx;
+  };
 
   // Sound effect functions using Web Audio API
   const playPopSound = () => {
-    const audioContext = new (
-      window.AudioContext || window.webkitAudioContext
-    )();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(
-      400,
-      audioContext.currentTime + 0.1,
-    );
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.01,
-      audioContext.currentTime + 0.1,
-    );
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
-  };
-
-  const playCelebrationSound = () => {
-    const audioContext = new (
-      window.AudioContext || window.webkitAudioContext
-    )();
-    const notes = [523.25, 659.25, 783.99, 1046.5]; // C, E, G, C (major chord)
-
-    notes.forEach((freq, index) => {
+    try {
+      const audioContext = getAudioContext();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
 
-      oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(
+        400,
+        audioContext.currentTime + 0.1,
+      );
 
-      const startTime = audioContext.currentTime + index * 0.1;
-      gainNode.gain.setValueAtTime(0, startTime);
-      gainNode.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + 0.1,
+      );
 
-      oscillator.start(startTime);
-      oscillator.stop(startTime + 0.5);
-    });
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (e) {
+      // Silently fail if audio not supported
+    }
+  };
+
+  const playCelebrationSound = () => {
+    try {
+      const audioContext = getAudioContext();
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C, E, G, C (major chord)
+
+      notes.forEach((freq, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+        oscillator.type = "sine";
+
+        const startTime = audioContext.currentTime + index * 0.1;
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(0.15, startTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+
+        oscillator.start(startTime);
+        oscillator.stop(startTime + 0.5);
+      });
+    } catch (e) {
+      // Silently fail if audio not supported
+    }
   };
 
   const handleYesClick = () => {
     setYesClicked(true);
     playCelebrationSound();
+
+    const particleCount = isMobile ? 3 : 5;
 
     // Trigger confetti
     const duration = 3000;
@@ -120,14 +138,14 @@ function App() {
 
     const frame = () => {
       confetti({
-        particleCount: 5,
+        particleCount: particleCount,
         angle: 60,
         spread: 55,
         origin: { x: 0 },
         colors: ["#ff69b4", "#ff1493", "#ff6b9d", "#ffc0cb"],
       });
       confetti({
-        particleCount: 5,
+        particleCount: particleCount,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
@@ -140,15 +158,15 @@ function App() {
     };
     frame();
 
-    // Additional heart burst
+    // Additional heart burst - fewer particles on mobile
     setTimeout(() => {
       confetti({
-        particleCount: 100,
+        particleCount: isMobile ? 50 : 100,
         spread: 70,
         origin: { y: 0.6 },
         colors: ["#ff69b4", "#ff1493", "#ff6b9d", "#ffc0cb", "#ff0000"],
         shapes: ["circle"],
-        scalar: 2,
+        scalar: isMobile ? 1.5 : 2,
       });
     }, 300);
   };
@@ -196,11 +214,17 @@ function App() {
               top: `${orb.top}%`,
               opacity: orb.opacity,
             }}
-            animate={{
-              x: [0, 50, -30, 40, 0],
-              y: [0, -40, 60, -30, 0],
-              scale: [1, 1.2, 0.9, 1.1, 1],
-            }}
+            animate={
+              isMobile
+                ? {
+                    scale: [1, 1.1, 1],
+                  }
+                : {
+                    x: [0, 50, -30, 40, 0],
+                    y: [0, -40, 60, -30, 0],
+                    scale: [1, 1.2, 0.9, 1.1, 1],
+                  }
+            }
             transition={{
               duration: orb.duration,
               delay: orb.delay,
@@ -340,10 +364,16 @@ function App() {
           >
             <motion.h1
               className="main-message success-text"
-              animate={{
-                scale: [1, 1.05, 1],
-                rotateZ: [-2, 2, -2],
-              }}
+              animate={
+                isMobile
+                  ? {
+                      scale: [1, 1.02, 1],
+                    }
+                  : {
+                      scale: [1, 1.05, 1],
+                      rotateZ: [-2, 2, -2],
+                    }
+              }
               transition={{
                 duration: 2,
                 repeat: Infinity,
@@ -359,37 +389,48 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              {Array.from({ length: 30 }, (_, i) => (
-                <motion.div
-                  key={i}
-                  className="celebration-heart"
-                  initial={{ y: 0, opacity: 1, scale: 0 }}
-                  animate={{
-                    y: -400,
-                    x: [0, (Math.random() - 0.5) * 100],
-                    opacity: 0,
-                    scale: [0, 1.2, 1, 0],
-                    rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
-                  }}
-                  transition={{
-                    duration: 3 + Math.random() * 2,
-                    delay: i * 0.08,
-                    repeat: Infinity,
-                    repeatDelay: 1,
-                    ease: "easeOut",
-                  }}
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    fontSize: `${1.5 + Math.random()}rem`,
-                  }}
-                >
-                  {
-                    ["❤️", "💕", "💖", "💗", "💓", "💝"][
-                      Math.floor(Math.random() * 6)
-                    ]
-                  }
-                </motion.div>
-              ))}
+              {Array.from(
+                { length: isMobile ? 10 : 30 },
+                (_, i) => (
+                  <motion.div
+                    key={i}
+                    className="celebration-heart"
+                    initial={{ y: 0, opacity: 1, scale: 0 }}
+                    animate={
+                      isMobile
+                        ? {
+                            y: -300,
+                            opacity: 0,
+                            scale: [0, 1, 0],
+                          }
+                        : {
+                            y: -400,
+                            x: [0, (Math.random() - 0.5) * 100],
+                            opacity: 0,
+                            scale: [0, 1.2, 1, 0],
+                            rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
+                          }
+                    }
+                    transition={{
+                      duration: isMobile ? 2.5 : 3 + Math.random() * 2,
+                      delay: i * 0.08,
+                      repeat: Infinity,
+                      repeatDelay: 1,
+                      ease: "easeOut",
+                    }}
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      fontSize: `${1.5 + Math.random()}rem`,
+                    }}
+                  >
+                    {
+                      ["❤️", "💕", "💖", "💗", "💓", "💝"][
+                        Math.floor(Math.random() * 6)
+                      ]
+                    }
+                  </motion.div>
+                )
+              )}
             </motion.div>
           </motion.div>
         )}
