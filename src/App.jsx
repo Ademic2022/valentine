@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import "./App.css";
@@ -14,6 +14,7 @@ function App() {
   const [hearts, setHearts] = useState([]);
   const [orbs, setOrbs] = useState([]);
   const [lastPosition, setLastPosition] = useState(null);
+  const lastSoundTime = useRef(0);
 
   // Predefined safe positions using percentage (always visible)
   const safePositions = [
@@ -73,6 +74,13 @@ function App() {
 
   // Sound effect functions using Web Audio API
   const playPopSound = () => {
+    // Debounce: only play if at least 150ms has passed since last sound
+    const now = Date.now();
+    if (now - lastSoundTime.current < 150) {
+      return;
+    }
+    lastSoundTime.current = now;
+
     try {
       const audioContext = getAudioContext();
       const oscillator = audioContext.createOscillator();
@@ -338,9 +346,6 @@ function App() {
                     position: "fixed",
                     zIndex: 9999,
                     transform: "translate(-50%, -50%)",
-                  }}
-                  whileHover={{
-                    scale: 0.98,
                   }}
                 >
                   No 😅
