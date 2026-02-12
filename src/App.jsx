@@ -64,7 +64,9 @@ function App() {
   // Reuse audio context for better performance
   const getAudioContext = () => {
     if (!window.audioCtx) {
-      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      window.audioCtx = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
     }
     return window.audioCtx;
   };
@@ -389,48 +391,45 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              {Array.from(
-                { length: isMobile ? 10 : 30 },
-                (_, i) => (
-                  <motion.div
-                    key={i}
-                    className="celebration-heart"
-                    initial={{ y: 0, opacity: 1, scale: 0 }}
-                    animate={
-                      isMobile
-                        ? {
-                            y: -300,
-                            opacity: 0,
-                            scale: [0, 1, 0],
-                          }
-                        : {
-                            y: -400,
-                            x: [0, (Math.random() - 0.5) * 100],
-                            opacity: 0,
-                            scale: [0, 1.2, 1, 0],
-                            rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
-                          }
-                    }
-                    transition={{
-                      duration: isMobile ? 2.5 : 3 + Math.random() * 2,
-                      delay: i * 0.08,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                      ease: "easeOut",
-                    }}
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      fontSize: `${1.5 + Math.random()}rem`,
-                    }}
-                  >
-                    {
-                      ["❤️", "💕", "💖", "💗", "💓", "💝"][
-                        Math.floor(Math.random() * 6)
-                      ]
-                    }
-                  </motion.div>
-                )
-              )}
+              {Array.from({ length: isMobile ? 10 : 30 }, (_, i) => (
+                <motion.div
+                  key={i}
+                  className="celebration-heart"
+                  initial={{ y: 0, opacity: 1, scale: 0 }}
+                  animate={
+                    isMobile
+                      ? {
+                          y: -300,
+                          opacity: 0,
+                          scale: [0, 1, 0],
+                        }
+                      : {
+                          y: -400,
+                          x: [0, (Math.random() - 0.5) * 100],
+                          opacity: 0,
+                          scale: [0, 1.2, 1, 0],
+                          rotate: [0, 360 * (Math.random() > 0.5 ? 1 : -1)],
+                        }
+                  }
+                  transition={{
+                    duration: isMobile ? 2.5 : 3 + Math.random() * 2,
+                    delay: i * 0.08,
+                    repeat: Infinity,
+                    repeatDelay: 1,
+                    ease: "easeOut",
+                  }}
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    fontSize: `${1.5 + Math.random()}rem`,
+                  }}
+                >
+                  {
+                    ["❤️", "💕", "💖", "💗", "💓", "💝"][
+                      Math.floor(Math.random() * 6)
+                    ]
+                  }
+                </motion.div>
+              ))}
             </motion.div>
           </motion.div>
         )}
